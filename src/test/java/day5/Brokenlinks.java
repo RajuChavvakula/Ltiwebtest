@@ -1,0 +1,67 @@
+package day5;
+
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeClass;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testng.annotations.AfterClass;
+
+import org.testng.annotations.Test;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterClass;
+
+public class Brokenlinks {
+	RemoteWebDriver driver;
+	  @Test
+	  public void findbrokenlinks() throws IOException {
+		  //finding all the links
+		  List<org.openqa.selenium.WebElement>alllinks=driver.findElements(By.tagName("a"));
+			int count = alllinks.size();
+			//System.out.println(count);
+			for (int i=0;i<count;i++) {
+			WebElement link = alllinks.get(i);
+	        String url= link.getAttribute("href");
+			//System.out.println(url);
+			URL plink =new URL(url);
+			URLConnection urlconnection= plink.openConnection();
+			HttpURLConnection httpcon =(HttpURLConnection) urlconnection;
+			httpcon.setConnectTimeout(5000);
+			httpcon.connect();
+			int rescode=httpcon.getResponseCode();
+			if(rescode == 200) {
+				System.out.println(url+"----->is valid links");
+			}else {
+				System.err.println(url+"---->is broken links");
+				httpcon.disconnect();
+			}
+				
+			}
+		  
+	  }
+	  @BeforeClass
+	  public void beforeClass() {
+		  System.setProperty("webdriver.chrome.driver","D:\\\\\\\\LTI TRAINING\\\\\\\\installations\\\\\\\\chromedriver_win32\\\\\\\\chromedriver.exe");
+			driver=new ChromeDriver();
+			driver.get("http://demowebshop.tricentis.com/");
+
+	  }
+
+	  @AfterClass
+	  public void afterClass() {
+		  driver.close();
+	  }
+
+}
